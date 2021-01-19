@@ -14,7 +14,7 @@ const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185
 const modifyList = (citiesList, todo, el) => {
   let find = false
   for (var i = 0; i < citiesList.length; i++) {
-    if (citiesList[i].nom === el.nom) {
+    if (citiesList[i].nom.toLowerCase() === el.nom.toLowerCase()) {
       find = true
       
       if(todo === 'delete') {
