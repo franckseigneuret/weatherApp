@@ -1,3 +1,4 @@
+var request = require("sync-request");
 var express = require('express');
 var router = express.Router();
 
@@ -8,8 +9,7 @@ let cityList = [
   { nom: 'Bordeaux', image: 'fa-snowflake', descriptif: 'ouragan', tmin: 7.5, tmax: 14.4},
 ]
 
-
-
+const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 
 const modifyList = (citiesList, todo, el) => {
   let find = false
@@ -46,8 +46,24 @@ router.get('/weather', function(req, res, next) {
 });
 
 router.get('/add-city', function(req, res, next) {
-  cityList = modifyList(cityList, 'add', {nom: req.query.city, image: 'fa-cloud', descriptif:'ça pèle', tmin:-5, tmax: -3})
-  res.render('weather', { title: 'WeatherApp', cityList });
+  let cityNotFound = false
+  const weatherURLCity = weatherURL + '&q=' + req.query.city
+  var result = request("GET", weatherURLCity)
+
+  var resultJSON = JSON.parse(result.body)
+
+  if(resultJSON.cod == '404') {
+    cityNotFound = true
+  } else {
+    cityList = modifyList(cityList, 'add', {
+      nom: req.query.city,
+      image: 'fa-cloud',
+      descriptif: resultJSON.weather.description,
+      tmin: resultJSON.main.temp_min,
+      tmax: resultJSON.main.temp_max,
+    })
+  }
+  res.render('weather', { title: 'WeatherApp', cityList, cityNotFound });
 });
 
 router.get('/delete-city', function(req, res, next) {

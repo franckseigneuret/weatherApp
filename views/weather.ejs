@@ -39,6 +39,13 @@
         <i class="fas fa-sync-alt"></i>
       </p>
     
+      <% if(cityNotFound) { %>
+        <br>
+        <br>
+        <strong>Cette ville n'existe pas</strong>
+        <br>
+        <br>
+      <% } %>
       <% if(cityList.length === 0) { %>
         No cities found
       <% } else { %>
