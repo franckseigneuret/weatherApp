@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="stylesheets/style.css">
+  <title>WeatherApp</title>
+</head>
+
+<body>
+
+
+  <!-- HEADER -->
+  <nav class=" header navbar navbar-light bg-dark">
+    Weather App
+    <a class="logout" href="./login.html">Deconnexion</a>
+  </nav>
+
+
+  <!-- GRID -->
+  <div class="container">
+    <div class="row">
+      <form action="/add-city" method="get">
+      <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Enter City Name" name="city">
+          <button class="btn btn-warning" type="submit">Add</button>
+        </div>
+      </form>
+
+      <img class="img-fluid" src="images/map.png" alt="map" />
+
+      <p class="text-center mt-2">
+        Update Cities
+        <i class="fas fa-sync-alt"></i>
+      </p>
+    
+      <% if(cityList.length === 0) { %>
+        No cities found
+      <% } else { %>
+      <ul class="list-group">
+        <% for (var i=0; i<cityList.length; i++) { %>
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col"><%=cityList[i].nom%></div>
+            <div class="col text-center">
+              <%=cityList[i].descriptif%>
+              <i class="fas <%=cityList[i].image%>"></i>
+              <span class="badge rounded-pill bg-secondary"><%=cityList[i].tmin%>°C</span>
+              <span class="badge rounded-pill bg-warning text-dark"><%=cityList[i].tmax%>°C</span>
+            </div>
+            <div class="col text-end">
+              <a href="/delete-city?nom=<%=cityList[i].nom%>"><i class="far fa-times-circle"></i></a>
+            </div>
+          </div>
+        </li>
+        <% } %>
+      </ul>
+      <% } %>
+
+    </div>
+  </div>
+
+
+  <script src="https://kit.fontawesome.com/a41e9403cf.js" crossorigin="anonymous"></script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
