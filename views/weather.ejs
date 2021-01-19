@@ -26,26 +26,27 @@
   <div class="container">
     <div class="row">
       <form action="/add-city" method="get">
-      <div class="input-group mb-3">
+        <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Enter City Name" name="city">
           <button class="btn btn-warning" type="submit">Add</button>
         </div>
       </form>
 
+      <% if(error.isError) { %>
+        <% if(error.type==='404') { %>
+          <h2>Cette ville n'existe pas</h2>
+        <% } else { %>
+          <h2>Il y a une erreur technique, désolé.</h2>
+        <% } %>
+      <% } %>
+      
       <img class="img-fluid" src="images/map.png" alt="map" />
 
       <p class="text-center mt-2">
         Update Cities
         <i class="fas fa-sync-alt"></i>
       </p>
-    
-      <% if(cityNotFound) { %>
-        <br>
-        <br>
-        <strong>Cette ville n'existe pas</strong>
-        <br>
-        <br>
-      <% } %>
+
       <% if(cityList.length === 0) { %>
         No cities found
       <% } else { %>
