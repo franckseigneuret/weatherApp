@@ -69,7 +69,7 @@ router.get('/add-city', async function (req, res, next) {
 
 router.get('/delete-city', async function (req, res, next) {
   await Cities.deleteOne(
-    { nom: req.query.nom }
+    { _id: req.query._id }
   );
   const cityList = await Cities.find()
 
