@@ -4,12 +4,7 @@ var router = express.Router();
 
 var Cities = require('./bdd')
 
-let cityList = [
-  // { nom: 'Paris', icon: '04d', descriptif: 'nuageux', tmin: 5, tmax: 12 },
-  // { nom: 'Lyon', icon: '01d', descriptif: 'ciel dégagé', tmin: 7, tmax: 14 },
-  // { nom: 'Toulouse', icon: '01d', descriptif: 'tempête', tmin: 5, tmax: 12 },
-  // { nom: 'Bordeaux', icon: '03d', descriptif: 'ouragan', tmin: 7.5, tmax: 14.4 },
-]
+let cityList = []
 
 const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 
@@ -44,7 +39,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/weather', async function (req, res, next) {
-  let cityList = await Cities.find()
+  cityList = await Cities.find()
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
 
@@ -67,12 +62,16 @@ router.get('/add-city', async function (req, res, next) {
   } else {
     error = { isError: true, type: resultJSON.cod }
   }
-  // console.log('error ==', error)
   res.render('weather', { title: 'WeatherApp', cityList, error });
 });
 
-router.get('/delete-city', function (req, res, next) {
-  cityList = modifyList(cityList, 'delete', req.query)
+router.get('/delete-city', async function (req, res, next) {
+  // cityList = modifyList(cityList, 'delete', req.query)
+  await Cities.deleteOne(
+    { nom: req.query.nom }
+  );
+  cityList = await Cities.find()
+
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
 
