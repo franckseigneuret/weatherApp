@@ -47,7 +47,7 @@ router.get('/add-city', async function (req, res, next) {
   var result = request("GET", weatherURLCity)
 
   var resultJSON = JSON.parse(result.body)
-  console.log(resultJSON)
+
   var cityData = {
     nom: resultJSON.name,
     icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
@@ -63,12 +63,11 @@ router.get('/add-city', async function (req, res, next) {
   } else {
     error = { isError: true, type: resultJSON.cod }
   }
-  
+
   res.render('weather', { title: 'WeatherApp', cityList, error });
 });
 
 router.get('/delete-city', async function (req, res, next) {
-  // cityList = modifyList(cityList, 'delete', req.query)
   await Cities.deleteOne(
     { nom: req.query.nom }
   );
@@ -76,5 +75,29 @@ router.get('/delete-city', async function (req, res, next) {
 
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
+
+router.get('/update-cities', async function (req, res, next) {
+  // boucle ville enregistrée en DB
+  let cityList = await Cities.find()
+  cityList.forEach(async function(city) {
+    // console.log('e', city)
+    let weatherURLCity = weatherURL + '&q=' + city.nom
+    let result = request("GET", weatherURLCity)
+    let resultJSON = JSON.parse(result.body)
+
+    await Cities.updateOne(
+      { _id: city._id },
+      {
+        nom: city.nom,
+        icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
+        descriptif: resultJSON.weather[0].description,
+        tmin: resultJSON.main.temp_min,
+        tmax: resultJSON.main.temp_max,
+      }
+    );
+  });
+  cityList = await Cities.find()
+  res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
+})
 
 module.exports = router;
