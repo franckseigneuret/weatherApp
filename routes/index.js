@@ -49,16 +49,17 @@ router.get('/add-city', async function (req, res, next) {
   var result = request("GET", weatherURLCity)
 
   var resultJSON = JSON.parse(result.body)
-
+  var cityData = {
+    nom: req.query.city,
+    icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
+    descriptif: resultJSON.weather[0].description,
+    tmin: resultJSON.main.temp_min,
+    tmax: resultJSON.main.temp_max,
+  }
   if (resultJSON.cod === 200) {
-    var newCity = new Cities({
-      nom: req.query.city,
-      icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
-      descriptif: resultJSON.weather[0].description,
-      tmin: resultJSON.main.temp_min,
-      tmax: resultJSON.main.temp_max,
-    });
-    var city = await newCity.save();
+    var newCity = new Cities(cityData);
+    cityList.push(cityData)
+    await newCity.save();
   } else {
     error = { isError: true, type: resultJSON.cod }
   }
