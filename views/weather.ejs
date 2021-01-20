@@ -57,7 +57,7 @@
             <div class="col"><%=cityList[i].nom%></div>
             <div class="col text-center">
               <%=cityList[i].descriptif%>
-              <img src="http://openweathermap.org/img/wn/<%=cityList[i].icon%>.png" alt="">
+              <img src="<%=cityList[i].icon%>" alt="<%=cityList[i].descriptif%>">
               <span class="badge rounded-pill bg-secondary"><%=cityList[i].tmin%>°C</span>
               <span class="badge rounded-pill bg-warning text-dark"><%=cityList[i].tmax%>°C</span>
             </div>
