@@ -2,6 +2,8 @@ var request = require("sync-request");
 var express = require('express');
 var router = express.Router();
 
+var Cities = require('./bdd')
+
 let cityList = [
   { nom: 'Paris', icon: '04d', descriptif: 'nuageux', tmin: 5, tmax: 12 },
   { nom: 'Lyon', icon: '01d', descriptif: 'ciel dégagé', tmin: 7, tmax: 14 },
@@ -45,7 +47,7 @@ router.get('/weather', function (req, res, next) {
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
 
-router.get('/add-city', function (req, res, next) {
+router.get('/add-city', async function (req, res, next) {
   let error = { isError: false, type: null }
   const weatherURLCity = weatherURL + '&q=' + req.query.city
   var result = request("GET", weatherURLCity)
@@ -53,13 +55,14 @@ router.get('/add-city', function (req, res, next) {
   var resultJSON = JSON.parse(result.body)
 
   if (resultJSON.cod === 200) {
-    cityList = modifyList(cityList, 'add', {
+    var newCity = new Cities({
       nom: req.query.city,
       icon: resultJSON.weather[0].icon,
       descriptif: resultJSON.weather[0].description,
       tmin: resultJSON.main.temp_min,
       tmax: resultJSON.main.temp_max,
-    })
+    });
+    var city = await newCity.save();
   } else {
     error = { isError: true, type: resultJSON.cod }
   }
