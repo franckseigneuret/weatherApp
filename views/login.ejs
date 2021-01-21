@@ -18,6 +18,11 @@
 
           <div class="col-12 text-center get_started">
             <h2>Get started with WeatherApp!</h2>
+            <% if(error) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= error %>
+              </div>
+            <%}%>
           </div>
 
           <!-- SIGN UP AREA -->

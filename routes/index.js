@@ -14,7 +14,7 @@ function cityNameFormat(name) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('login', { title: 'login WeatherApp' });
+  res.render('login', { title: 'login WeatherApp', error: null });
 });
 
 router.get('/weather', async function (req, res, next) {
@@ -94,20 +94,26 @@ router.get('/update-cities', async function (req, res, next) {
 })
 
 router.post('/sign-up', async function (req, res, next) {
-  const newUser = await Users({
-    username: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-  })
-  const newUserDB = await newUser.save();
+  const isUserInDB = await Users.find({ email: req.body.email })
 
-  req.session.username = newUserDB.username
-  req.session._id = newUserDB._id
-  req.session.email = newUserDB.email
-  req.session.password = newUserDB.password
-  console.log('session = ', req.session)
+  if (isUserInDB.length > 0) {
+    res.render('login', { error: 'Ce mail ne peut être enregistré plus d\'une fois en base de données' })
+  } else {
+    const newUser = await Users({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+    })
+    const newUserDB = await newUser.save();
 
-  res.redirect('weather')
+    req.session.username = newUserDB.username
+    req.session._id = newUserDB._id
+    req.session.email = newUserDB.email
+    req.session.password = newUserDB.password
+    console.log('session = ', req.session)
+
+    res.redirect('weather')
+  }
 })
 
 module.exports = router;
