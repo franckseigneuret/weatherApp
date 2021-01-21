@@ -2,12 +2,12 @@ var request = require("sync-request");
 var express = require('express');
 var router = express.Router();
 
-var Cities = require('../models/cities')
+const Cities = require('../models/cities')
 
 const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 
 function cityNameFormat(name) {
-  var formatName = name.charAt(0).toUpperCase() + name.slice(1)
+  const formatName = name.charAt(0).toUpperCase() + name.slice(1)
   return formatName
 }
 
@@ -25,17 +25,6 @@ router.get('/weather', async function (req, res, next) {
 // Ajout Ville en DB
 router.get('/add-city', async function (req, res, next) {
   let error = { isError: false, type: null }
-  const weatherURLCity = weatherURL + '&q=' + req.query.city
-  var result = request("GET", weatherURLCity)
-  var resultJSON = JSON.parse(result.body)
-
-  var cityData = {
-    nom: resultJSON.name,
-    icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
-    descriptif: resultJSON.weather[0].description,
-    tmin: resultJSON.main.temp_min,
-    tmax: resultJSON.main.temp_max,
-  }
 
   let cityList = await Cities.find() // récupère la liste des villes en DB
   let checkNewCityInDB = await Cities.find({nom: cityNameFormat(req.query.city)})
@@ -43,12 +32,26 @@ router.get('/add-city', async function (req, res, next) {
   if (checkNewCityInDB.length > 0) {
     error = { isError: true, type: 'doublon' }
   }
-  else if (resultJSON.cod === 200) {
-    var newCity = new Cities(cityData);
-    await newCity.save(); // ajoute la nouvelle ville en DB
-    cityList.push(cityData) // implémente la nouvelle ville au tableau cityList
-  } else {
-    error = { isError: true, type: resultJSON.cod }
+  else {
+    const weatherURLCity = weatherURL + '&q=' + req.query.city
+    const result = request("GET", weatherURLCity)
+    const resultJSON = JSON.parse(result.body)
+    if (resultJSON.cod === 200) {
+      
+      const cityData = {
+        nom: resultJSON.name,
+        icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
+        descriptif: resultJSON.weather[0].description,
+        tmin: resultJSON.main.temp_min,
+        tmax: resultJSON.main.temp_max,
+      }
+      const newCity = new Cities(cityData);
+      await newCity.save(); // ajoute la nouvelle ville en DB
+      cityList.push(cityData) // implémente la nouvelle ville au tableau cityList
+
+    } else {
+      error = { isError: true, type: resultJSON.cod }
+    }
   }
 
   res.render('weather', { title: 'WeatherApp', cityList, error });
