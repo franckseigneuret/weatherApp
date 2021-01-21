@@ -1,4 +1,4 @@
-require('./models/bdd'); // initialise la connexion à la DB et surtout permet de vérifier si ça se passe bien
+require('./models/connection'); // initialise la connexion à la DB et surtout permet de vérifier si ça se passe bien
 
 var createError = require('http-errors');
 var express = require('express');

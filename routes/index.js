@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 
 const Cities = require('../models/cities')
+const Users = require('../models/users')
 
 const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 
@@ -27,7 +28,7 @@ router.get('/add-city', async function (req, res, next) {
   let error = { isError: false, type: null }
 
   let cityList = await Cities.find() // récupère la liste des villes en DB
-  let checkNewCityInDB = await Cities.find({nom: cityNameFormat(req.query.city)})
+  let checkNewCityInDB = await Cities.find({ nom: cityNameFormat(req.query.city) })
 
   if (checkNewCityInDB.length > 0) {
     error = { isError: true, type: 'doublon' }
@@ -36,8 +37,8 @@ router.get('/add-city', async function (req, res, next) {
     const weatherURLCity = weatherURL + '&q=' + req.query.city
     const result = request("GET", weatherURLCity)
     const resultJSON = JSON.parse(result.body)
+
     if (resultJSON.cod === 200) {
-      
       const cityData = {
         nom: resultJSON.name,
         icon: `http://openweathermap.org/img/wn/${resultJSON.weather[0].icon}.png`,
@@ -57,6 +58,7 @@ router.get('/add-city', async function (req, res, next) {
   res.render('weather', { title: 'WeatherApp', cityList, error });
 });
 
+// Supprime Ville en DB
 router.get('/delete-city', async function (req, res, next) {
   await Cities.deleteOne(
     { _id: req.query._id }
@@ -66,10 +68,11 @@ router.get('/delete-city', async function (req, res, next) {
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
 
+// Mise à jour des datas des villes : lecture WS + sauvegarde DB
 router.get('/update-cities', async function (req, res, next) {
   // boucle ville enregistrée en DB
   let cityList = await Cities.find()
-  cityList.forEach(async function(city) {
+  cityList.forEach(async function (city) {
     // console.log('e', city)
     let weatherURLCity = weatherURL + '&q=' + city.nom
     let result = request("GET", weatherURLCity)
@@ -88,6 +91,17 @@ router.get('/update-cities', async function (req, res, next) {
   });
   cityList = await Cities.find()
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
+})
+
+router.post('/sign-up', async function (req, res, next) {
+  const newUser = await Users({
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+  })
+  await newUser.save();
+
+  res.redirect('weather')
 })
 
 module.exports = router;
