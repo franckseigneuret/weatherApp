@@ -33,7 +33,9 @@
       </form>
 
       <% if(error.isError) { %>
-        <% if(error.type==='404') { %>
+        <% if(error.type==='doublon') { %>
+          <h2>Cette ville est déjà dans la liste</h2>
+        <% } else if(error.type==='404') { %>
           <h2>Cette ville n'existe pas</h2>
         <% } else { %>
           <h2>Il y a une erreur technique, désolé.</h2>

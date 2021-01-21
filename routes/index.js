@@ -6,29 +6,9 @@ var Cities = require('../models/cities')
 
 const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 
-const modifyList = (citiesList, todo, el) => {
-  let find = false
-  for (var i = 0; i < citiesList.length; i++) {
-    if (citiesList[i].nom.toLowerCase() === el.nom.toLowerCase()) {
-      find = true
-
-      if (todo === 'delete') {
-        citiesList.splice(i, 1)
-      }
-    }
-  }
-
-  if (!find && todo === 'add' && el.nom !== '') {
-    citiesList.push({
-      nom: el.nom,
-      icon: `http://openweathermap.org/img/wn/${el.icon}.png`,
-      descriptif: el.descriptif,
-      tmin: el.tmin,
-      tmax: el.tmax,
-    })
-  }
-
-  return citiesList
+function cityNameFormat(name) {
+  var formatName = name.charAt(0).toUpperCase() + name.slice(1)
+  return formatName
 }
 
 /* GET home page. */
@@ -41,11 +21,12 @@ router.get('/weather', async function (req, res, next) {
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
 
+
+// Ajout Ville en DB
 router.get('/add-city', async function (req, res, next) {
   let error = { isError: false, type: null }
   const weatherURLCity = weatherURL + '&q=' + req.query.city
   var result = request("GET", weatherURLCity)
-
   var resultJSON = JSON.parse(result.body)
 
   var cityData = {
@@ -55,11 +36,17 @@ router.get('/add-city', async function (req, res, next) {
     tmin: resultJSON.main.temp_min,
     tmax: resultJSON.main.temp_max,
   }
-  let cityList = await Cities.find()
-  if (resultJSON.cod === 200) {
+
+  let cityList = await Cities.find() // récupère la liste des villes en DB
+  let checkNewCityInDB = await Cities.find({nom: cityNameFormat(req.query.city)})
+
+  if (checkNewCityInDB.length > 0) {
+    error = { isError: true, type: 'doublon' }
+  }
+  else if (resultJSON.cod === 200) {
     var newCity = new Cities(cityData);
-    await newCity.save();
-    cityList.push(cityData)
+    await newCity.save(); // ajoute la nouvelle ville en DB
+    cityList.push(cityData) // implémente la nouvelle ville au tableau cityList
   } else {
     error = { isError: true, type: resultJSON.cod }
   }
