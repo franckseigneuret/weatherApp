@@ -1,3 +1,5 @@
+require('./models/bdd'); // initialise la connexion à la DB et surtout permet de vérifier si ça se passe bien
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -8,7 +10,6 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
-// require('./routes/bdd');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

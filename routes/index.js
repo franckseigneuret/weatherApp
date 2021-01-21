@@ -2,7 +2,7 @@ var request = require("sync-request");
 var express = require('express');
 var router = express.Router();
 
-var Cities = require('./bdd')
+var Cities = require('../models/cities')
 
 const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?appid=b49185709cdd24c630699b40eaa3d7ed&units=metric&lang=fr'
 

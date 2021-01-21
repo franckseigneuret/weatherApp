@@ -17,15 +17,3 @@ mongoose.connect(URI_BDD,
     console.log(err);
   }
 );
-
-var citySchema = mongoose.Schema({
-  nom: String,
-  icon: String,
-  descriptif: String,
-  tmin: Number,
-  tmax: Number,
-});
-
-var Cities = mongoose.model('cities', citySchema);
-
-module.exports = Cities
