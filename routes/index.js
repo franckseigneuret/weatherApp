@@ -99,7 +99,13 @@ router.post('/sign-up', async function (req, res, next) {
     email: req.body.email,
     password: req.body.password,
   })
-  await newUser.save();
+  const newUserDB = await newUser.save();
+
+  req.session.username = newUserDB.username
+  req.session._id = newUserDB._id
+  req.session.email = newUserDB.email
+  req.session.password = newUserDB.password
+  console.log('session = ', req.session)
 
   res.redirect('weather')
 })
