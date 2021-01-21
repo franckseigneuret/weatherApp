@@ -18,6 +18,11 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/weather', async function (req, res, next) {
+
+  if (req.session.user === undefined) {
+    res.redirect('/')
+  }
+
   const cityList = await Cities.find()
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 });
@@ -139,6 +144,7 @@ router.post('/sign-in', async function (req, res, next) {
 
 // déconnexion
 router.get('/logout', function(req, res) {
+  req.session.user = undefined
   res.redirect('/')
 })
 
