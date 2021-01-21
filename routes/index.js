@@ -93,6 +93,7 @@ router.get('/update-cities', async function (req, res, next) {
   res.render('weather', { title: 'WeatherApp', cityList, error: { isError: false, type: null } });
 })
 
+// nouvelle inscription
 router.post('/sign-up', async function (req, res, next) {
   const isUserInDB = await Users.find({ email: req.body.email })
 
@@ -106,13 +107,33 @@ router.post('/sign-up', async function (req, res, next) {
     })
     const newUserDB = await newUser.save();
 
-    req.session.username = newUserDB.username
-    req.session._id = newUserDB._id
-    req.session.email = newUserDB.email
-    req.session.password = newUserDB.password
+    req.session.user = {
+      name: newUserDB.username,
+      email: newUserDB.email,
+    }
     console.log('session = ', req.session)
 
     res.redirect('weather')
+  }
+})
+
+// identification
+router.post('/sign-in', async function (req, res, next) {
+  const searchUserInDB = await Users.findOne({
+    email: req.body.email,
+    password: req.body.password,
+  })
+
+  if (searchUserInDB !== null) {
+    req.session.user = {
+      name: searchUserInDB.username,
+      email: searchUserInDB.email,
+    }
+    res.redirect('weather')
+  }
+
+  if (searchUserInDB === null) {
+    res.render('login', { error: 'Il doit y avoir une erreur du mail et/ou du mot de passe' })
   }
 })
 
